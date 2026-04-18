@@ -143,41 +143,40 @@ int main() {
                         if (mousePressed->button == sf::Mouse::Button::Right) {
                             if (!tiles[row][col].isRevealed) {
                                 tiles[row][col].isFlagged = !tiles[row][col].isFlagged;
-                            } else if (mousePressed->button == sf::Mouse::Button::Left) {
-                                if (!tiles[row][col].isFlagged && !tiles[row][col].isRevealed) {
-                                    tiles[row][col].isRevealed = true;
-                                }
+                            }
+                        } else if (mousePressed->button == sf::Mouse::Button::Left) {
+                            if (!tiles[row][col].isFlagged && !tiles[row][col].isRevealed) {
+                                tiles[row][col].isRevealed = true;
                             }
                         }
                     }
                 }
-                gameWindow.clear(sf::Color::White);
-
-                for (int row = 0; row < rowCount; ++row) {
-                    for (int col = 0; col < colCount; ++col) {
-                        float xPos = (float)col * 32.0f;
-                        float yPos = (float)row * 32.0f;
-
-                        if (tiles[row][col].isRevealed) {
-                            revealedTile.setPosition({xPos, yPos});
-                            gameWindow.draw(revealedTile);
-                        } else {
-                            hiddenTile.setPosition({xPos, yPos});
-                            gameWindow.draw(hiddenTile);
-
-                            if (tiles[row][col].isFlagged) {
-                                flagImg.setPosition({xPos, yPos});
-                                gameWindow.draw(flagImg);
-                            }
-                        }
-                    }
-                }
-                gameWindow.draw(faceBtn);
-                gameWindow.draw(debugTextureBtn);
-                gameWindow.draw(pauseBtn);
-                gameWindow.draw(leaderBtn);
-                gameWindow.display();
             }
+            gameWindow.clear(sf::Color::White);
+            for (int row = 0; row < rowCount; ++row) {
+                for (int col = 0; col < colCount; ++col) {
+                    float xPos = (float)col * 32.0f;
+                    float yPos = (float)row * 32.0f;
+
+                    if (tiles[row][col].isRevealed) {
+                        revealedTile.setPosition({xPos, yPos});
+                        gameWindow.draw(revealedTile);
+                    } else {
+                        hiddenTile.setPosition({xPos, yPos});
+                        gameWindow.draw(hiddenTile);
+
+                        if (tiles[row][col].isFlagged) {
+                            flagImg.setPosition({xPos, yPos});
+                            gameWindow.draw(flagImg);
+                        }
+                    }
+                }
+            }
+            gameWindow.draw(faceBtn);
+            gameWindow.draw(debugTextureBtn);
+            gameWindow.draw(pauseBtn);
+            gameWindow.draw(leaderBtn);
+            gameWindow.display();
         }
         return 0;
     }
