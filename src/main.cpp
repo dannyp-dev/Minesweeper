@@ -3,6 +3,8 @@
 #include <fstream>
 #include <string>
 #include <cctype>
+#include <cstdlib>
+#include <ctime>
 
 class Tile {
     public:
@@ -18,6 +20,21 @@ void setText(sf::Text &text, float x, float y) {
     text.setPosition({x, y});
 }
 
+void placeMines(std::vector<std::vector<Tile>>& tiles, int rowCount, int colCount, int mineCount) {
+    int minesPlaced = 0;
+
+    while (minesPlaced < mineCount) {
+        int randomRow = rand() % rowCount;
+        int randomCol = rand() % colCount;
+
+        if (!tiles[randomRow][randomCol].hasMine) {
+            tiles[randomRow][randomCol].hasMine = true;
+            minesPlaced++;
+        }
+    }
+}
+
+
 int main() {
     int colCount = 25;
     int rowCount = 16;
@@ -29,6 +46,9 @@ int main() {
     }
 
     std::vector<std::vector<Tile>> tiles(rowCount, std::vector<Tile>(colCount));
+
+    srand(time(0));
+    placeMines(tiles, rowCount, colCount, mineCount);
 
     unsigned int windowWidth = colCount * 32;
     unsigned int windowHeight = (rowCount * 32) + 100;
@@ -104,7 +124,7 @@ int main() {
     if (startGame) {
         sf::RenderWindow gameWindow(sf::VideoMode({windowWidth, windowHeight}), "Minesweeper", sf::Style::Titlebar | sf::Style::Close);
 
-        sf::Texture happyFaceTexture, debugTexture, pauseTexture, leaderboardTexture, titleHiddenTexture, titleRevealedTexture, flag;
+        sf::Texture happyFaceTexture, debugTexture, pauseTexture, leaderboardTexture, titleHiddenTexture, titleRevealedTexture, flag, mineTexture;
         happyFaceTexture.loadFromFile("files/images/face_happy.png");
         debugTexture.loadFromFile("files/images/debug.png");
         pauseTexture.loadFromFile("files/images/pause.png");
@@ -112,6 +132,7 @@ int main() {
         titleHiddenTexture.loadFromFile("files/images/tile_hidden.png");
         titleRevealedTexture.loadFromFile("files/images/tile_revealed.png");
         flag.loadFromFile("files/images/flag.png");
+        mineTexture.loadFromFile("files/images/mine.png");
 
         sf::Sprite faceBtn(happyFaceTexture);
         sf::Sprite debugTextureBtn(debugTexture);
@@ -120,12 +141,15 @@ int main() {
         sf::Sprite hiddenTile(titleHiddenTexture);
         sf::Sprite revealedTile(titleRevealedTexture);
         sf::Sprite flagImg(flag);
+        sf::Sprite mineImg(mineTexture);
 
         float uiY = 32.0f * ((float)rowCount + 0.5f);
         faceBtn.setPosition({((float)colCount / 2.0f) * 32.0f, uiY});
         debugTextureBtn.setPosition({((float)colCount * 32.0f) - 304.0f, uiY});
         pauseBtn.setPosition({((float)colCount * 32.0f) - 240.0f, uiY});
         leaderBtn.setPosition({((float)colCount * 32.0f) - 176.0f, uiY});
+
+        bool debugMode = false;
 
         while (gameWindow.isOpen()) {
             while (const std::optional event = gameWindow.pollEvent()) {
@@ -135,6 +159,12 @@ int main() {
                 if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
                     float mouseX = mousePressed->position.x;
                     float mouseY = mousePressed->position.y;
+
+                    if (mousePressed->button == sf::Mouse::Button::Left) {
+                        if (debugTextureBtn.getGlobalBounds().contains({mouseX, mouseY})) {
+                            debugMode = !debugMode;
+                        }
+                    }
 
                     int col = (int)(mouseX / 32.0f);
                     int row = (int)(mouseY / 32.0f);
@@ -168,6 +198,10 @@ int main() {
                         if (tiles[row][col].isFlagged) {
                             flagImg.setPosition({xPos, yPos});
                             gameWindow.draw(flagImg);
+                        }
+                        if (debugMode && tiles[row][col].hasMine) {
+                            mineImg.setPosition({xPos, yPos});
+                            gameWindow.draw(mineImg);
                         }
                     }
                 }
