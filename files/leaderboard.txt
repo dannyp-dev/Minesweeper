@@ -1,5 +1,3 @@
 07:01, Alex
-09:04, Bruce
-10:03, Carl
-11:24, Dan
-12:15, Eve
+09:04, Bruce 
+10:03, Carl 
